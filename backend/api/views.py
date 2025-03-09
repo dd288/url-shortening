@@ -7,6 +7,8 @@ from rest_framework import status
 from .models import ShortURL
 from .serializers import ShortURLSerializer
 
+BASE_URL = "http://short-url.xyz"  # Ensure this is the correct domain
+
 @api_view(['POST'])
 def shorten_url(request):
     """Creates a new short URL every time and ensures expired links are deleted"""
@@ -23,8 +25,10 @@ def shorten_url(request):
     if serializer.is_valid():
         # Always create a new short URL
         url_obj = ShortURL.objects.create(original_url=serializer.validated_data["original_url"])
+        short_url = f"{BASE_URL}/{url_obj.short_code}" # Correct formatting
+
         return Response({
-            "short_url": url_obj.short_code,
+            "short_url": short_url,
             "expires_at": url_obj.expires_at.strftime('%Y-%m-%d %H:%M:%S')  # Return expiration info
         }, status=status.HTTP_201_CREATED)
 

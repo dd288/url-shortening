@@ -16,7 +16,8 @@ async function shortenUrl() {
 
         const data = await response.json();
         if (response.ok) {
-            const shortUrl = `http://127.0.0.1:8000/api/${data.short_url}/`;  // Manually construct the correct URL
+            const shortUrl = data.short_url;   // The backend already provides the correct full URL
+            console.log("✅ Final Short URL:", shortUrl);
             document.getElementById("shortUrlOutput").innerHTML = `Short URL: <a href="${shortUrl}" target="_blank">${shortUrl}</a>`;
         } else {
             document.getElementById("shortUrlOutput").innerText = `Error: ${data.detail || "Failed to shorten URL"}`;

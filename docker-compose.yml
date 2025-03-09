@@ -1,0 +1,98 @@
+services:
+  web:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: django-app
+    restart: always
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - ./backend/backend/.env 
+    ports:
+      - "8000:8000"
+    networks:
+      - short-url-network
+    extra_hosts:
+      - "short-url.xyz:127.0.0.1"
+    volumes:
+      - ./backend:/app
+
+  db:
+    image: postgres:15
+    container_name: postgres-db
+    restart: always
+    environment:
+      POSTGRES_DB: shorturl_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mana12345
+    ports:
+      - "5432:5432"
+    networks:
+      - short-url-network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:alpine
+    container_name: redis-cache
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - short-url-network
+
+  celery:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: celery-worker
+    restart: always
+    depends_on:
+      - redis
+      - db
+      - web
+    env_file:
+      - ./backend/backend/.env  
+    networks:
+      - short-url-network
+    command: ["celery", "-A", "backend", "worker", "--loglevel=info"]
+
+  celery-beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: celery-beat
+    restart: always
+    depends_on:
+      - redis
+      - db
+      - celery
+    env_file:
+      - ./backend/backend/.env 
+    networks:
+      - short-url-network
+    command: ["celery", "-A", "backend", "beat", "--loglevel=info"]
+
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend-app
+    restart: always
+    ports:
+      - "8001:8001"
+    networks:
+      - short-url-network
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - web
+
+networks:
+  short-url-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

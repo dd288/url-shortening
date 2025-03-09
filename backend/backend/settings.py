@@ -127,7 +127,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -136,7 +136,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # Celery Settings
-CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Redis running in Docker
+CELERY_BROKER_URL = 'redis://redis:6379/0'  # Redis running in Docker
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 
@@ -147,7 +147,7 @@ INSTALLED_APPS += [
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://localhost:6379/1",  # Use a different Redis DB (db=1)
+        "LOCATION": "redis://redis:6379/1",  # Use a different Redis DB (db=1)
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
@@ -166,7 +166,7 @@ REST_FRAMEWORK = {
 }
 
 # NGINX Settings
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", "short-url"]  # Allow requests from Nginx
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "short-url.xyz"]  # Allow requests from Nginx
 
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
